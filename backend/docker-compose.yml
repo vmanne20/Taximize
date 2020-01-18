@@ -1,0 +1,37 @@
+version: "3.7"
+services:
+  mongo:
+    image: mongo
+    ports: 
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+  api:
+    build: .
+    volumes:
+      - .:/usr/src/app
+      - node_modules:/usr/src/app/node_modules
+    depends_on:
+      - mongo
+    working_dir: /usr/src/app
+    environment:
+      NODE_ENV: development
+      WAIT_HOSTS: mongo:27017
+    ports:
+      - "3000:3000"
+      
+  adminmongo:
+    image: mrvautin/adminmongo
+    restart: "always"
+    environment:
+      - HOST=0.0.0.0
+      - DB_HOST=mongodb
+      - DB_PORT=27017
+    ports:
+      - "1234:1234"
+    links:
+      - mongo
+
+volumes:
+ mongo-data:
+ node_modules:
